@@ -13,12 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.hilcode.versionator.maven;
+package com.github.hilcode.versionator.maven.impl;
 
 import java.io.File;
-import com.google.common.collect.ImmutableList;
 
-public interface PomFinder
+public final class PomFinderUtils
 {
-	ImmutableList<Pom> findAllPoms(File rootDir);
+	public static final File toCanonical(final File file)
+	{
+		try
+		{
+			return file.getCanonicalFile();
+		}
+		catch (final Exception e)
+		{
+			throw new IllegalStateException(e.getMessage(), e);
+		}
+	}
 }

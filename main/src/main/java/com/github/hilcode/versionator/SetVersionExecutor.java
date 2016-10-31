@@ -28,16 +28,12 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import org.fusesource.jansi.Ansi.Color;
-import org.w3c.dom.Document;
 import com.github.hilcode.versionator.maven.Gav;
 import com.github.hilcode.versionator.maven.GroupArtifact;
 import com.github.hilcode.versionator.maven.Pom;
 import com.github.hilcode.versionator.maven.PomFinder;
-import com.github.hilcode.versionator.maven.PomParser;
-import com.github.hilcode.versionator.maven.Property;
-import com.github.hilcode.versionator.maven.Type;
 import com.github.hilcode.versionator.maven.VersionSetter;
-import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -53,17 +49,22 @@ import com.google.common.primitives.Longs;
 
 public final class SetVersionExecutor
 {
+	private final PomFinder pomFinder;
+
+	private final Command.SetVersion commandSetVersion;
+
 	private final HashFunction goodFastHashFunction;
 
 	private final File tempDir;
 
-	private final Command.SetVersion commandSetVersion;
-
-	public SetVersionExecutor(final Command.SetVersion commandSetVersion)
+	public SetVersionExecutor(final PomFinder pomFinder, final Command.SetVersion commandSetVersion)
 	{
+		Preconditions.checkNotNull(pomFinder, "Missing 'pomFinder'.");
+		Preconditions.checkNotNull(commandSetVersion, "Missing 'commandSetVersion'.");
+		this.pomFinder = pomFinder;
+		this.commandSetVersion = commandSetVersion;
 		this.goodFastHashFunction = Hashing.goodFastHash(128);
 		this.tempDir = Files.createTempDir();
-		this.commandSetVersion = commandSetVersion;
 	}
 
 	public static final UUID fromHashCodeToUuid(final HashCode hashCode)
@@ -77,7 +78,7 @@ public final class SetVersionExecutor
 	public void execute() throws Exception
 	{
 		final File rootDir = this.commandSetVersion.rootDir;
-		final ImmutableList<Pom> poms = findAllPoms(rootDir);
+		final ImmutableList<Pom> poms = this.pomFinder.findAllPoms(rootDir);
 		final ImmutableMap.Builder<Pom, File> pomToFileMapBuilder = ImmutableMap.builder();
 		final Map<Pom, Gav> pomToGavMap = Maps.newConcurrentMap();
 		final Map<Pom, UUID> pomToUuidMap = Maps.newConcurrentMap();
@@ -214,35 +215,15 @@ public final class SetVersionExecutor
 		this.tempDir.delete();
 	}
 
-	public static final ImmutableList<Pom> findAllPoms(final File rootDir)
-	{
-		final PomFinder pomFinder = new PomFinder();
-		final PomParser pomParser = new PomParser();
-		final List<Pom> allPoms = Lists.newArrayList();
-		for (final File pomFile : pomFinder.findPoms(rootDir))
-		{
-			final Document pomDocument = pomParser.toDocument(pomFile);
-			final Optional<Gav> parentGav = pomParser.findParentGav(pomDocument);
-			final Gav gav = pomParser.findGav(pomDocument);
-			final Type type = pomParser.findType(pomDocument);
-			final ImmutableList<Property> properties = pomParser.findProperties(pomDocument);
-			final ImmutableList<Gav> dependencies = pomParser.findDependencies(pomDocument);
-			final Pom pom = new Pom(gav, pomFile, type, parentGav, properties, dependencies);
-			allPoms.add(pom);
-		}
-		Collections.sort(allPoms);
-		return ImmutableList.copyOf(allPoms);
-	}
-
 	public static final ImmutableList<Gav> findAllGavs(final ImmutableList<Pom> poms)
 	{
 		final Set<Gav> allGavsSet = Sets.newConcurrentHashSet();
 		for (final Pom pom : poms)
 		{
 			allGavsSet.add(pom.gav);
-			if (pom.parentGav.isPresent())
+			if (pom.parent.isPresent())
 			{
-				allGavsSet.add(pom.parentGav.get());
+				allGavsSet.add(pom.parent.get().gav);
 			}
 			for (final Gav dependency : pom.dependencies)
 			{
@@ -279,9 +260,9 @@ public final class SetVersionExecutor
 		for (final Pom pom : poms)
 		{
 			pomsDirectlyAffectedByGroupArtifact.get(pom.gav.groupArtifact).add(pom);
-			if (pom.parentGav.isPresent())
+			if (pom.parent.isPresent())
 			{
-				pomsDirectlyAffectedByGroupArtifact.get(pom.parentGav.get().groupArtifact).add(pom);
+				pomsDirectlyAffectedByGroupArtifact.get(pom.parent.get().gav.groupArtifact).add(pom);
 			}
 			for (final Gav dependency : pom.dependencies)
 			{

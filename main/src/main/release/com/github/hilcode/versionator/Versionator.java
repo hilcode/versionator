@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.hilcode.versionator.maven;
+package com.github.hilcode.versionator;
 
-import java.io.File;
-import com.google.common.collect.ImmutableList;
-
-public interface PomFinder
+public interface Versionator
 {
-	ImmutableList<Pom> findAllPoms(File rootDir);
+	String VERSION = "@VERSION@";
+
+	String RELEASE_DATE = "@RELEASE_DATE@";
 }

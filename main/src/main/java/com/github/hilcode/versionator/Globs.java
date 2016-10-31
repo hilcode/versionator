@@ -27,9 +27,9 @@ public final class Globs
 		return new Glob(pattern);
 	}
 
-	public static final class Glob
+	static final class Glob
 	{
-		private final String pattern;
+		public final String pattern;
 
 		public Glob(final String pattern)
 		{
@@ -53,62 +53,82 @@ public final class Globs
 					return false;
 				}
 				final BitSet bits = new BitSet(this.pattern.length() + 1);
-				final List<Integer> globOffsets_ = Lists.newArrayList();
-				final char ch = text.charAt(i);
-				for (final Integer globOffset_ : globOffsets)
+				final List<Integer> globOffsetsNext = Lists.newArrayList();
+				final char nextCharInText = text.charAt(i);
+				for (final Integer globOffset : globOffsets)
 				{
-					final int globOffset = globOffset_.intValue();
-					if (globOffset >= this.pattern.length())
+					final int globIndex = globOffset.intValue();
+					if (globIndex >= this.pattern.length())
 					{
 						continue;
 					}
-					final char globChar = this.pattern.charAt(globOffset);
+					final char globChar = this.pattern.charAt(globIndex);
 					switch (globChar)
 					{
 						case '?':
-							if (!bits.get(globOffset + 1))
-							{
-								bits.set(globOffset + 1);
-								globOffsets_.add(Integer.valueOf(globOffset + 1));
-							}
+							handleSingleCharacterGlob(bits, globOffsetsNext, globIndex);
 							break;
 						case '*':
-							if (!bits.get(globOffset))
-							{
-								bits.set(globOffset);
-								globOffsets_.add(globOffset_);
-							}
-							if (!bits.get(globOffset + 1))
-							{
-								bits.set(globOffset + 1);
-								globOffsets_.add(Integer.valueOf(globOffset + 1));
-							}
-							if (!bits.get(globOffset + 2) && globOffset + 1 < this.pattern.length())
-							{
-								if (this.pattern.charAt(globOffset + 1) == '?' || this.pattern.charAt(globOffset + 1) == ch)
-								{
-									bits.set(globOffset + 2);
-									globOffsets_.add(Integer.valueOf(globOffset + 2));
-								}
-							}
+							handleMultiCharacterGlob(bits, globOffsetsNext, nextCharInText, globOffset, globIndex);
 							break;
 						default:
-							if (globChar == ch)
+							if (globChar == nextCharInText)
 							{
-								if (!bits.get(globOffset + 1))
-								{
-									bits.set(globOffset + 1);
-									globOffsets_.add(Integer.valueOf(globOffset + 1));
-								}
+								handleSingleCharacterGlob(bits, globOffsetsNext, globIndex);
 							}
 							break;
 					}
 				}
-				globOffsets = globOffsets_;
+				globOffsets = globOffsetsNext;
 			}
+			return determineResult(globOffsets);
+		}
+
+		public void handleSingleCharacterGlob(
+				final BitSet bits,
+				final List<Integer> globOffsets,
+				final int globIndex)
+		{
+			if (!bits.get(globIndex + 1))
+			{
+				bits.set(globIndex + 1);
+				globOffsets.add(Integer.valueOf(globIndex + 1));
+			}
+		}
+
+		public void handleMultiCharacterGlob(
+				final BitSet bits,
+				final List<Integer> globOffsets,
+				final char nextCharInText,
+				final Integer globOffset,
+				final int globIndex)
+		{
+			if (!bits.get(globIndex))
+			{
+				bits.set(globIndex);
+				globOffsets.add(globOffset);
+			}
+			bits.set(globIndex + 1);
+			globOffsets.add(Integer.valueOf(globIndex + 1));
+			if (globIndex + 1 < this.pattern.length())
+			{
+				if (this.pattern.charAt(globIndex + 1) == '?' || this.pattern.charAt(globIndex + 1) == nextCharInText)
+				{
+					bits.set(globIndex + 2);
+					globOffsets.add(Integer.valueOf(globIndex + 2));
+				}
+			}
+		}
+
+		public boolean determineResult(final List<Integer> globOffsets)
+		{
 			for (final Integer globOffset : globOffsets)
 			{
-				if (globOffset.intValue() == this.pattern.length() || this.pattern.endsWith("*") && globOffset.intValue() + 1 == this.pattern.length())
+				if (globOffset.intValue() == this.pattern.length())
+				{
+					return true;
+				}
+				if (globOffset.intValue() + 1 == this.pattern.length() && this.pattern.endsWith("*"))
 				{
 					return true;
 				}
@@ -121,42 +141,5 @@ public final class Globs
 		{
 			return String.format("(Glob pattern='%s')", this.pattern);
 		}
-	}
-
-	public static void main(final String[] args)
-	{
-		Preconditions.checkState(Globs.create("").match(""));
-		Preconditions.checkState(!Globs.create("a").match(""));
-		Preconditions.checkState(!Globs.create("").match("a"));
-		Preconditions.checkState(Globs.create("Hello world!").match("Hello world!"));
-		Preconditions.checkState(Globs.create("?").match("1"));
-		Preconditions.checkState(!Globs.create("?").match(""));
-		Preconditions.checkState(!Globs.create("?").match("12"));
-		Preconditions.checkState(!Globs.create("??").match("1"));
-		Preconditions.checkState(Globs.create("??").match("12"));
-		Preconditions.checkState(!Globs.create("??").match("123"));
-		Preconditions.checkState(Globs.create("1?3").match("123"));
-		Preconditions.checkState(Globs.create("1?").match("12"));
-		Preconditions.checkState(!Globs.create("1?").match("22"));
-		Preconditions.checkState(Globs.create("?2").match("12"));
-		Preconditions.checkState(!Globs.create("?2").match("23"));
-		Preconditions.checkState(Globs.create("*").match(""));
-		Preconditions.checkState(Globs.create("*").match("1"));
-		Preconditions.checkState(Globs.create("*").match("12"));
-		Preconditions.checkState(Globs.create("*").match("123"));
-		Preconditions.checkState(!Globs.create("1*").match(""));
-		Preconditions.checkState(Globs.create("1*").match("1"));
-		Preconditions.checkState(Globs.create("1*").match("12"));
-		Preconditions.checkState(Globs.create("1*").match("123"));
-		Preconditions.checkState(!Globs.create("*1").match(""));
-		Preconditions.checkState(Globs.create("*1").match("1"));
-		Preconditions.checkState(Globs.create("*12").match("12"));
-		Preconditions.checkState(Globs.create("*123").match("123"));
-		Preconditions.checkState(Globs.create("1*2").match("12"));
-		Preconditions.checkState(Globs.create("1*3").match("123"));
-		Preconditions.checkState(Globs.create("1*?").match("12"));
-		Preconditions.checkState(Globs.create("1*?").match("123"));
-		Preconditions.checkState(Globs.create("1*?3").match("123"));
-		System.out.println("Ready.");
 	}
 }

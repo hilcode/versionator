@@ -15,6 +15,8 @@
  */
 package com.github.hilcode.versionator;
 
+import static com.github.hilcode.versionator.maven.impl.PomParserUtils.evaluateNodes;
+import static com.github.hilcode.versionator.maven.impl.PomParserUtils.newXpathExpression;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -34,9 +36,8 @@ import com.github.hilcode.versionator.maven.GroupArtifact;
 import com.github.hilcode.versionator.maven.Pom;
 import com.github.hilcode.versionator.maven.PomFinder;
 import com.github.hilcode.versionator.maven.PomParser;
-import com.github.hilcode.versionator.maven.Property;
-import com.github.hilcode.versionator.maven.Type;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -44,10 +45,19 @@ import com.google.common.collect.Sets;
 
 public final class ListExecutor
 {
+	private final PomParser pomParser;
+
+	private final PomFinder pomFinder;
+
 	private final Command.List commandList;
 
-	public ListExecutor(final Command.List commandList)
+	public ListExecutor(final PomParser pomParser, final PomFinder pomFinder, final Command.List commandList)
 	{
+		Preconditions.checkNotNull(pomParser, "Missing 'pomParser'.");
+		Preconditions.checkNotNull(pomFinder, "Missing 'pomFinder'.");
+		Preconditions.checkNotNull(commandList, "Missing 'commandList'.");
+		this.pomParser = pomParser;
+		this.pomFinder = pomFinder;
 		this.commandList = commandList;
 	}
 
@@ -57,18 +67,17 @@ public final class ListExecutor
 		final File rootDir = rootDir_.getPath().endsWith(".")
 				? rootDir_.getParentFile()
 				: rootDir_;
-		final ImmutableList<Pom> poms = findAllPoms(rootDir);
-		final PomParser pomParser = new PomParser();
+		final ImmutableList<Pom> poms = this.pomFinder.findAllPoms(rootDir);
 		final XPath xpath = XPathFactory.newInstance().newXPath();
-		final XPathExpression xpathExpr = PomParser.newXpathExpression(xpath, "/project/*//*/artifactId");
-		final XPathExpression artifactIdXpath = PomParser.newXpathExpression(xpath, "artifactId");
-		final XPathExpression groupIdXpath = PomParser.newXpathExpression(xpath, "groupId");
-		final XPathExpression versionXpath = PomParser.newXpathExpression(xpath, "version");
+		final XPathExpression xpathExpr = newXpathExpression(xpath, "/project/*//*/artifactId");
+		final XPathExpression artifactIdXpath = newXpathExpression(xpath, "artifactId");
+		final XPathExpression groupIdXpath = newXpathExpression(xpath, "groupId");
+		final XPathExpression versionXpath = newXpathExpression(xpath, "version");
 		final Set<PomAndGav> pomAndGavs = Sets.newConcurrentHashSet();
 		for (final Pom pom : poms)
 		{
-			final Document pomDocument = pomParser.toDocument(pom.file);
-			final NodeList nodeList = PomParser.evaluateNodes(xpathExpr, pomDocument);
+			final Document pomDocument = this.pomParser.toDocument(pom.file);
+			final NodeList nodeList = evaluateNodes(xpathExpr, pomDocument);
 			for (int i = 0; i < nodeList.getLength(); i++)
 			{
 				final Node node = nodeList.item(i);
@@ -253,25 +262,5 @@ public final class ListExecutor
 		{
 			throw new IllegalStateException(e.getMessage(), e);
 		}
-	}
-
-	public static final ImmutableList<Pom> findAllPoms(final File rootDir)
-	{
-		final PomFinder pomFinder = new PomFinder();
-		final PomParser pomParser = new PomParser();
-		final List<Pom> allPoms = Lists.newArrayList();
-		for (final File pomFile : pomFinder.findPoms(rootDir))
-		{
-			final Document pomDocument = pomParser.toDocument(pomFile);
-			final Optional<Gav> parentGav = pomParser.findParentGav(pomDocument);
-			final Gav gav = pomParser.findGav(pomDocument);
-			final Type type = pomParser.findType(pomDocument);
-			final ImmutableList<Property> properties = pomParser.findProperties(pomDocument);
-			final ImmutableList<Gav> dependencies = pomParser.findDependencies(pomDocument);
-			final Pom pom = new Pom(gav, pomFile, type, parentGav, properties, dependencies);
-			allPoms.add(pom);
-		}
-		Collections.sort(allPoms);
-		return ImmutableList.copyOf(allPoms);
 	}
 }

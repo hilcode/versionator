@@ -31,7 +31,9 @@ public final class Pom
 
 	public final Type type;
 
-	public final Optional<Gav> parentGav;
+	public final Optional<Pom> parent;
+
+	public final ImmutableList<String> modules;
 
 	public final ImmutableList<Property> properties;
 
@@ -41,20 +43,23 @@ public final class Pom
 			final Gav gav,
 			final File file,
 			final Type type,
-			final Optional<Gav> parentGav,
+			final Optional<Pom> parent,
+			final ImmutableList<String> modules,
 			final ImmutableList<Property> properties,
 			final ImmutableList<Gav> dependencies)
 	{
 		Preconditions.checkNotNull(gav, "Missing 'gav'.");
 		Preconditions.checkNotNull(file, "Missing 'file'.");
 		Preconditions.checkNotNull(type, "Missing 'type'.");
-		Preconditions.checkNotNull(parentGav, "Missing 'parentGav'.");
+		Preconditions.checkNotNull(parent, "Missing 'parent'.");
+		Preconditions.checkNotNull(modules, "Missing 'modules'.");
 		Preconditions.checkNotNull(properties, "Missing 'properties'.");
 		Preconditions.checkNotNull(dependencies, "Missing 'dependencies'.");
 		this.gav = gav;
 		this.file = file;
 		this.type = type;
-		this.parentGav = parentGav;
+		this.parent = parent;
+		this.modules = modules;
 		this.properties = properties;
 		this.dependencies = dependencies;
 	}
@@ -67,7 +72,8 @@ public final class Pom
 		result = prime * result + this.gav.hashCode();
 		result = prime * result + this.file.hashCode();
 		result = prime * result + this.type.hashCode();
-		result = prime * result + this.parentGav.hashCode();
+		result = prime * result + this.parent.hashCode();
+		result = prime * result + this.modules.hashCode();
 		result = prime * result + this.properties.hashCode();
 		result = prime * result + this.dependencies.hashCode();
 		return result;
@@ -100,7 +106,8 @@ public final class Pom
 				.compare(this.gav, other.gav)
 				.compare(this.file, other.file)
 				.compare(this.type, other.type)
-				.compare(this.parentGav, other.parentGav, OptionalComparator.<Gav> instance())
+				.compare(this.parent, other.parent, OptionalComparator.<Pom> instance())
+				.compare(this.modules, other.modules, CollectionComparator.<String> instance())
 				.compare(this.properties, other.properties, CollectionComparator.<Property> instance())
 				.compare(this.dependencies, other.dependencies, CollectionComparator.<Gav> instance())
 				.result();
@@ -114,7 +121,8 @@ public final class Pom
 		builder.append(" gav=").append(this.gav);
 		builder.append(" file='").append(this.file).append("'");
 		builder.append(" type=").append(this.type);
-		builder.append(" parentGav=").append(this.parentGav);
+		builder.append(" parent=").append(this.parent);
+		builder.append(" modules=").append(this.modules);
 		builder.append(" properties=").append(this.properties);
 		builder.append(" dependencies=").append(this.dependencies);
 		builder.append(")");

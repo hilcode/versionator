@@ -25,13 +25,13 @@
 	<parent>
 		<groupId>com.github.hilcode</groupId>
 		<artifactId>versionator-pom</artifactId>
-		<version>1</version>
+		<version>2</version>
 		<relativePath>../poms</relativePath>
 	</parent>
 
 	<groupId>com.github.hilcode</groupId>
 	<artifactId>versionator-api</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2</version>
 	<packaging>jar</packaging>
 
 	<name>Versionator API</name>

@@ -23,7 +23,7 @@ import com.beust.jcommander.internal.Lists;
 
 public final class CommandLineInterface
 {
-	public static final class Help
+	public static final class Basics
 	{
 		@Parameter(
 				names =
@@ -32,6 +32,13 @@ public final class CommandLineInterface
 				},
 				help = true)
 		public Boolean help;
+
+		@Parameter(
+				names =
+				{
+					"-v", "--version"
+				})
+		public Boolean version;
 	}
 
 	@Parameters(separators = "=", commandDescription = "Lists dependencies.")

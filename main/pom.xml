@@ -25,13 +25,13 @@
 	<parent>
 		<groupId>com.github.hilcode</groupId>
 		<artifactId>versionator-pom</artifactId>
-		<version>1</version>
+		<version>2</version>
 		<relativePath>../poms</relativePath>
 	</parent>
 
 	<groupId>com.github.hilcode</groupId>
 	<artifactId>versionator-tool</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2</version>
 	<packaging>jar</packaging>
 
 	<name>Versionator Tool</name>
@@ -42,13 +42,25 @@
 		<dependency>
 			<groupId>com.github.hilcode</groupId>
 			<artifactId>versionator-api</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.github.hilcode</groupId>
 			<artifactId>versionator-impl</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.beust</groupId>
+			<artifactId>jcommander</artifactId>
+			<version>1.58</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>18.0</version>
 		</dependency>
 
 		<dependency>
@@ -63,6 +75,14 @@
 			<version>1.14</version>
 		</dependency>
 
+		<!-- Scope 'test' -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -72,6 +92,52 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-sources</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<tstamp>
+									<format
+										property="timestamp"
+										timezone="UTC"
+										pattern="yyyy-MM-dd HH:mm:ss z"/>
+								</tstamp>
+								<filter token="VERSION" value="${project.version}"/>
+								<filter token="RELEASE_DATE" value="${timestamp}"/>
+								<copy toDir="${project.build.directory}/generated-sources/release" filtering="true">
+									<fileset dir="src/main/release"/>
+								</copy>
+							</target>
+						</configuration>
+					</execution>
+					<execution>
+						<id>package</id>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<property name='script.name' value='versionator'/>
+								<echo file='${project.build.directory}/${script.name}'>
+									<![CDATA[
+									#!/bin/bash
+
+									SCRIPT_DIR="$(cd "$(dirname "$0")" ; pwd)"
+									java -jar "${SCRIPT_DIR}"/${project.artifactId}-${project.version}.jar "$$@"${line.separator}
+									]]>
+								</echo>
+								<replaceregexp file='${project.build.directory}/${script.name}' match='^[\t]+' replace='' byline='true'/>
+								<chmod file="${project.build.directory}/${script.name}" perm="a+rx"/>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 
 			<plugin>
@@ -92,6 +158,25 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.build.directory}/generated-sources/release</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 
 			<plugin>

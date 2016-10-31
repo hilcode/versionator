@@ -20,14 +20,20 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.github.hilcode.versionator.CommandLineInterface.CommandRelease;
 import com.github.hilcode.versionator.CommandLineInterface.CommandSetVersion;
+import com.github.hilcode.versionator.maven.PomFinder;
+import com.github.hilcode.versionator.maven.PomParser;
+import com.github.hilcode.versionator.maven.impl.DefaultPomFinder;
+import com.github.hilcode.versionator.maven.impl.DefaultPomParser;
 import com.google.common.collect.ImmutableList;
 
 public final class Main
 {
 	public static final void main(final String[] args) throws Exception
 	{
-		final CommandLineInterface.Help help = new CommandLineInterface.Help();
-		final JCommander commander = new JCommander(help);
+		final PomParser pomParser = new DefaultPomParser();
+		final PomFinder pomFinder = new DefaultPomFinder(pomParser);
+		final CommandLineInterface.Basics basics = new CommandLineInterface.Basics();
+		final JCommander commander = new JCommander(basics);
 		final CommandLineInterface.CommandList commandList = new CommandLineInterface.CommandList();
 		commander.addCommand(CommandLineInterface.CommandList.COMMAND, commandList);
 		final CommandSetVersion commandSetVersion = new CommandSetVersion();
@@ -37,9 +43,17 @@ public final class Main
 		try
 		{
 			commander.parse(args);
-			if (help.help != null)
+			if (basics.help != null || basics.version != null)
 			{
-				commander.usage();
+				if (basics.version != null)
+				{
+					System.out.println(
+							String.format("Versionator %s\n%s", Versionator.VERSION, Versionator.RELEASE_DATE));
+				}
+				if (basics.help != null)
+				{
+					commander.usage();
+				}
 				return;
 			}
 			if (CommandLineInterface.CommandList.COMMAND.equals(commander.getParsedCommand()))
@@ -53,7 +67,7 @@ public final class Main
 						commandList.groupByPom
 								? Command.Grouping.BY_POM
 								: Command.Grouping.BY_GAV);
-				new ListExecutor(list).execute();
+				new ListExecutor(pomParser, pomFinder, list).execute();
 			}
 			else if (CommandSetVersion.COMMAND.equals(commander.getParsedCommand()))
 			{
@@ -69,7 +83,7 @@ public final class Main
 								? Command.Colour.NO_COLOUR
 								: Command.Colour.COLOUR,
 						ImmutableList.<String> copyOf(commandSetVersion.gavs));
-				new SetVersionExecutor(setVersion).execute();
+				new SetVersionExecutor(pomFinder, setVersion).execute();
 			}
 			else if (CommandRelease.COMMAND.equals(commander.getParsedCommand()))
 			{
@@ -85,7 +99,7 @@ public final class Main
 								? Command.Colour.NO_COLOUR
 								: Command.Colour.COLOUR,
 						ImmutableList.<String> copyOf(commandRelease.exclusions));
-				new ReleaseExecutor(release).execute();
+				new ReleaseExecutor(pomFinder, release).execute();
 			}
 			else
 			{
