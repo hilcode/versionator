@@ -78,7 +78,7 @@ public final class DefaultPomParser
 		this.typeExpr = newXpathExpression(xpath, "/project/type");
 		this.moduleExpr = newXpathExpression(xpath, "/project/modules/module");
 		this.propertyExpr = newXpathExpression(xpath, "/project/properties/*");
-		this.dependencyExpr = newXpathExpression(xpath, "//dependency");
+		this.dependencyExpr = newXpathExpression(xpath, "/project/*//*/artifactId");
 		this.documentBuilder = newDocumentBuilder();
 	}
 
@@ -93,7 +93,7 @@ public final class DefaultPomParser
 	{
 		final Node parentGroupIdNode = evaluateNode(this.parentGroupIdExpr, pom);
 		return parentGroupIdNode != null
-				? parentGroupIdNode.getTextContent()
+				? parentGroupIdNode.getTextContent().trim()
 				: "";
 	}
 
@@ -102,7 +102,7 @@ public final class DefaultPomParser
 	{
 		final Node parentArtifactIdNode = evaluateNode(this.parentArtifactIdExpr, pom);
 		return parentArtifactIdNode != null
-				? parentArtifactIdNode.getTextContent()
+				? parentArtifactIdNode.getTextContent().trim()
 				: "";
 	}
 
@@ -111,7 +111,7 @@ public final class DefaultPomParser
 	{
 		final Node parentVersionNode = evaluateNode(this.parentVersionExpr, pom);
 		return parentVersionNode != null
-				? parentVersionNode.getTextContent()
+				? parentVersionNode.getTextContent().trim()
 				: "";
 	}
 
@@ -120,7 +120,7 @@ public final class DefaultPomParser
 	{
 		final Node parentRelativePathNode = evaluateNode(this.parentRelativePathExpr, pom);
 		return parentRelativePathNode != null
-				? parentRelativePathNode.getTextContent()
+				? parentRelativePathNode.getTextContent().trim()
 				: "..";
 	}
 
@@ -129,14 +129,14 @@ public final class DefaultPomParser
 	{
 		final Node groupIdNode = evaluateNode(this.groupIdExpr, pom);
 		return groupIdNode != null
-				? groupIdNode.getTextContent()
+				? groupIdNode.getTextContent().trim()
 				: findParentGroupId(pom);
 	}
 
 	@Override
 	public String findArtifactId(final Document pom)
 	{
-		return evaluateNode(this.artifactIdExpr, pom).getTextContent();
+		return evaluateNode(this.artifactIdExpr, pom).getTextContent().trim();
 	}
 
 	@Override
@@ -144,7 +144,7 @@ public final class DefaultPomParser
 	{
 		final Node versionNode = evaluateNode(this.versionExpr, pom);
 		return versionNode != null
-				? versionNode.getTextContent()
+				? versionNode.getTextContent().trim()
 				: findParentVersion(pom);
 	}
 
@@ -167,7 +167,7 @@ public final class DefaultPomParser
 		for (int i = 0; i < propertiesNodeList.getLength(); i++)
 		{
 			final Node propertyNode = propertiesNodeList.item(i);
-			final String module = propertyNode.getFirstChild().getTextContent();
+			final String module = propertyNode.getFirstChild().getTextContent().trim();
 			propertiesBuilder.add(module);
 		}
 		return propertiesBuilder.build();
@@ -183,7 +183,7 @@ public final class DefaultPomParser
 			final Node propertyNode = propertiesNodeList.item(i);
 			final String key = propertyNode.getNodeName();
 			final String value = propertyNode.getFirstChild() != null
-					? propertyNode.getFirstChild().getTextContent()
+					? propertyNode.getFirstChild().getTextContent().trim()
 					: "";
 			propertiesBuilder.add(new Property(key, value));
 		}
@@ -204,7 +204,7 @@ public final class DefaultPomParser
 	{
 		final Node typeNode = evaluateNode(this.typeExpr, pom);
 		return typeNode != null
-				? Type.toType(typeNode.getTextContent())
+				? Type.toType(typeNode.getTextContent().trim())
 				: Type.JAR;
 	}
 
@@ -215,7 +215,7 @@ public final class DefaultPomParser
 		final NodeList dependencies = evaluateNodes(this.dependencyExpr, pom);
 		for (int i = 0; i < dependencies.getLength(); i++)
 		{
-			final Node dependency = dependencies.item(i);
+			final Node dependency = dependencies.item(i).getParentNode();
 			final Optional<Gav> maybeGav = findDependency(dependency, pom);
 			if (maybeGav.isPresent())
 			{

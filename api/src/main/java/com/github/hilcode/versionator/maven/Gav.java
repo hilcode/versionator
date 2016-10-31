@@ -95,7 +95,7 @@ public final class Gav
 		return ComparisonChain
 				.start()
 				.compare(this.groupArtifact, other.groupArtifact)
-				.compare(this.version, other.version)
+				.compare(this.version.toLowerCase(), other.version.toLowerCase())
 				.result();
 	}
 

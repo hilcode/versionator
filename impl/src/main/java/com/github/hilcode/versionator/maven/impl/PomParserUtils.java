@@ -101,15 +101,15 @@ public final class PomParserUtils
 			final Node node = nodes.item(j);
 			if (node.getNodeName().equals("groupId"))
 			{
-				groupId = node.getTextContent();
+				groupId = node.getTextContent().trim();
 			}
 			else if (node.getNodeName().equals("artifactId"))
 			{
-				artifactId = node.getTextContent();
+				artifactId = node.getTextContent().trim();
 			}
 			else if (node.getNodeName().equals("version"))
 			{
-				version = node.getTextContent();
+				version = node.getTextContent().trim();
 			}
 		}
 		return groupId.isEmpty() || artifactId.isEmpty() || version.isEmpty()

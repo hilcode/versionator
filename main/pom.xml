@@ -31,7 +31,7 @@
 
 	<groupId>com.github.hilcode</groupId>
 	<artifactId>versionator-tool</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<packaging>jar</packaging>
 
 	<name>Versionator Tool</name>
@@ -42,13 +42,13 @@
 		<dependency>
 			<groupId>com.github.hilcode</groupId>
 			<artifactId>versionator-api</artifactId>
-			<version>0.0.2</version>
+			<version>0.0.3</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.github.hilcode</groupId>
 			<artifactId>versionator-impl</artifactId>
-			<version>0.0.2</version>
+			<version>0.0.3</version>
 		</dependency>
 
 		<dependency>

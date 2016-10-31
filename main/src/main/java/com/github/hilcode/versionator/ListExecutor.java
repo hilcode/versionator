@@ -15,21 +15,16 @@
  */
 package com.github.hilcode.versionator;
 
-import static com.github.hilcode.versionator.maven.impl.PomParserUtils.evaluateNodes;
-import static com.github.hilcode.versionator.maven.impl.PomParserUtils.newXpathExpression;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import com.github.hilcode.versionator.Globs.Glob;
 import com.github.hilcode.versionator.maven.Gav;
 import com.github.hilcode.versionator.maven.GroupArtifact;
@@ -68,49 +63,13 @@ public final class ListExecutor
 				? rootDir_.getParentFile()
 				: rootDir_;
 		final ImmutableList<Pom> poms = this.pomFinder.findAllPoms(rootDir);
-		final XPath xpath = XPathFactory.newInstance().newXPath();
-		final XPathExpression xpathExpr = newXpathExpression(xpath, "/project/*//*/artifactId");
-		final XPathExpression artifactIdXpath = newXpathExpression(xpath, "artifactId");
-		final XPathExpression groupIdXpath = newXpathExpression(xpath, "groupId");
-		final XPathExpression versionXpath = newXpathExpression(xpath, "version");
 		final Set<PomAndGav> pomAndGavs = Sets.newConcurrentHashSet();
 		for (final Pom pom : poms)
 		{
 			final Document pomDocument = this.pomParser.toDocument(pom.file);
-			final NodeList nodeList = evaluateNodes(xpathExpr, pomDocument);
-			for (int i = 0; i < nodeList.getLength(); i++)
+			final ImmutableList<Gav> gavs = this.pomParser.findDependencies(pomDocument);
+			for (final Gav gav : gavs)
 			{
-				final Node node = nodeList.item(i);
-				final Node parent = node.getParentNode();
-				final Optional<String> maybeGroupId = extractText(parent, groupIdXpath);
-				final String groupId;
-				if (maybeGroupId.isPresent())
-				{
-					groupId = maybeGroupId.get();
-				}
-				else
-				{
-					if ("plugin".equals(parent.getNodeName()))
-					{
-						groupId = "org.apache.maven.plugins";
-					}
-					else
-					{
-						groupId = "";
-					}
-				}
-				final String artifactId = extractText(parent, artifactIdXpath).get();
-				final Optional<String> maybeVersion = extractText(parent, versionXpath);
-				final String version;
-				if (maybeVersion.isPresent())
-				{
-					version = maybeVersion.get();
-				}
-				else
-				{
-					version = "";
-				}
-				final Gav gav = Gav.BUILDER.build(GroupArtifact.BUILDER.build(groupId, artifactId), version);
 				boolean includeGav = true;
 				for (final String pattern : this.commandList.patterns)
 				{
@@ -256,7 +215,7 @@ public final class ListExecutor
 		try
 		{
 			final Node node = (Node) xpathExpression.evaluate(parent, XPathConstants.NODE);
-			return node != null ? Optional.of(node.getTextContent()) : Optional.<String> absent();
+			return node != null ? Optional.of(node.getTextContent().trim()) : Optional.<String> absent();
 		}
 		catch (final XPathExpressionException e)
 		{

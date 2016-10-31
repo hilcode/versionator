@@ -60,11 +60,11 @@ public final class VersionSetter
 		}
 	}
 
-	public static final void updateToken(final XMLModifier xmlModifier, final int index, final Gav gav)
+	public static final void updateToken(final XMLModifier xmlModifier, final int index, final String text)
 	{
 		try
 		{
-			xmlModifier.updateToken(index, gav.version);
+			xmlModifier.updateToken(index, text);
 		}
 		catch (final Exception e)
 		{
@@ -88,7 +88,7 @@ public final class VersionSetter
 	public void updateAll(final File pomFile, final File newPomFile, final Gav gav)
 	{
 		final String xpath = String.format(
-				"//*[child::groupId='%s' and child::artifactId='%s']/version/text()",
+				"//*[normalize-space(normalize-space(child::groupId='%s')) and normalize-space(normalize-space(child::artifactId))='%s']/version/text()",
 				gav.groupArtifact.groupId,
 				gav.groupArtifact.artifactId);
 		final VTDGen vtdGenerator = new VTDGen();
@@ -106,7 +106,7 @@ public final class VersionSetter
 				{
 					break;
 				}
-				updateToken(xmlModifier, index, gav);
+				updateToken(xmlModifier, index, gav.version);
 			}
 			output(xmlModifier, newPomFile);
 		}

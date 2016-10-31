@@ -61,8 +61,8 @@ public final class GroupArtifact
 		Preconditions.checkArgument(groupId.length() > 0, "Empty 'groupId'.");
 		Preconditions.checkNotNull(artifactId, "Missing 'artifactId'.");
 		Preconditions.checkArgument(artifactId.length() > 0, "Empty 'artifactId'.");
-		this.groupId = groupId;
-		this.artifactId = artifactId;
+		this.groupId = groupId.trim();
+		this.artifactId = artifactId.trim();
 	}
 
 	@Override
@@ -95,8 +95,8 @@ public final class GroupArtifact
 	{
 		return ComparisonChain
 				.start()
-				.compare(this.groupId, other.groupId)
-				.compare(this.artifactId, other.artifactId)
+				.compare(this.groupId.toLowerCase(), other.groupId.toLowerCase())
+				.compare(this.artifactId.toLowerCase(), other.artifactId.toLowerCase())
 				.result();
 	}
 
