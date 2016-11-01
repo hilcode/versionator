@@ -37,7 +37,8 @@
 		<module>poms</module>
 		<module>api</module>
 		<module>impl</module>
-		<module>main</module>
+		<module>tool</module>
+		<module>integration-tests</module>
 	</modules>
 
 </project>

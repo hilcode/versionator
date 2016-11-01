@@ -25,13 +25,13 @@
 	<parent>
 		<groupId>com.github.hilcode</groupId>
 		<artifactId>versionator-pom</artifactId>
-		<version>2</version>
+		<version>3</version>
 		<relativePath>../poms</relativePath>
 	</parent>
 
 	<groupId>com.github.hilcode</groupId>
 	<artifactId>versionator-impl</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 	<packaging>jar</packaging>
 
 	<name>Versionator IMPL</name>
@@ -40,15 +40,9 @@
 
 		<!-- Scope 'compile' -->
 		<dependency>
-			<groupId>com.beust</groupId>
-			<artifactId>jcommander</artifactId>
-			<version>1.58</version>
-		</dependency>
-
-		<dependency>
 			<groupId>com.github.hilcode</groupId>
 			<artifactId>versionator-api</artifactId>
-			<version>0.0.3</version>
+			<version>0.0.4</version>
 		</dependency>
 
 		<dependency>
@@ -97,6 +91,11 @@
 		<plugins>
 
 			<plugin>
+				<groupId>net.orfjackal.retrolambda</groupId>
+				<artifactId>retrolambda-maven-plugin</artifactId>
+			</plugin>
+
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
 			</plugin>
@@ -109,6 +108,11 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>animal-sniffer-maven-plugin</artifactId>
 			</plugin>
 
 			<plugin>

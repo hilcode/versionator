@@ -21,7 +21,7 @@ public final class Either<L, R>
 {
 	public static final <L, R> Either<L, R> left(final L value)
 	{
-		return new Either<L, R>(value, null);
+		return new Either<>(value, null);
 	}
 
 	public static final <T, L, R> Either<L, R> asLeft(final Either<L, T> either)
@@ -34,7 +34,7 @@ public final class Either<L, R>
 
 	public static final <L, R> Either<L, R> right(final R value)
 	{
-		return new Either<L, R>(null, value);
+		return new Either<>(null, value);
 	}
 
 	public static final <T, L, R> Either<L, R> asRight(final Either<T, R> either)

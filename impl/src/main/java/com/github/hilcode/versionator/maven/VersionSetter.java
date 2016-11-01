@@ -85,7 +85,7 @@ public final class VersionSetter
 		}
 	}
 
-	public void updateAll(final File pomFile, final File newPomFile, final Gav gav)
+	public void updateAll(final File pomFile, final Gav gav)
 	{
 		final String xpath = String.format(
 				"//*[normalize-space(normalize-space(child::groupId='%s')) and normalize-space(normalize-space(child::artifactId))='%s']/version/text()",
@@ -108,7 +108,7 @@ public final class VersionSetter
 				}
 				updateToken(xmlModifier, index, gav.version);
 			}
-			output(xmlModifier, newPomFile);
+			output(xmlModifier, pomFile);
 		}
 		else
 		{

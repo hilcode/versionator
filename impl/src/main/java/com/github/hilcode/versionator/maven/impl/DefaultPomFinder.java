@@ -23,9 +23,12 @@ import java.util.Map;
 import org.w3c.dom.Document;
 import com.github.hilcode.versionator.maven.Gav;
 import com.github.hilcode.versionator.maven.GroupArtifact;
+import com.github.hilcode.versionator.maven.GroupIdSource;
 import com.github.hilcode.versionator.maven.Pom;
 import com.github.hilcode.versionator.maven.PomFinder;
 import com.github.hilcode.versionator.maven.PomParser;
+import com.github.hilcode.versionator.maven.VersionSource;
+import com.github.hilcode.versionator.misc.Tuple;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -58,17 +61,19 @@ public final class DefaultPomFinder
 	public void findPoms(final Map<GroupArtifact, Pom> map, final File pomFile)
 	{
 		final Document pomDocument = this.pomParser.toDocument(pomFile);
-		final Gav gav = this.pomParser.findGav(pomDocument);
+		final Tuple._3<GroupIdSource, VersionSource, Gav> gavTuple = this.pomParser.findGav(pomDocument);
 		final ImmutableList<String> modules = this.pomParser.findModules(pomDocument);
 		final Pom pom = new Pom(
-				gav,
+				gavTuple._3,
+				gavTuple._1,
+				gavTuple._2,
 				toCanonical(pomFile.getAbsoluteFile()),
 				this.pomParser.findType(pomDocument),
 				findParentPom(map, pomFile, this.pomParser.findParentGav(pomDocument), pomDocument),
 				modules,
 				this.pomParser.findProperties(pomDocument),
 				this.pomParser.findDependencies(pomDocument));
-		map.put(gav.groupArtifact, pom);
+		map.put(gavTuple._3.groupArtifact, pom);
 		for (final String module : modules)
 		{
 			final File moduleDir = new File(pomFile.getParentFile(), module);

@@ -24,7 +24,7 @@
 
 	<groupId>com.github.hilcode</groupId>
 	<artifactId>versionator-pom</artifactId>
-	<version>2</version>
+	<version>3</version>
 	<packaging>pom</packaging>
 
 	<name>Versionator POM</name>
@@ -34,6 +34,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+		<animal-sniffer-maven-plugin.version>1.15</animal-sniffer-maven-plugin.version>
 		<build-helper-maven-plugin.version>1.12</build-helper-maven-plugin.version>
 		<jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
 		<maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
@@ -55,6 +56,7 @@
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
 		<maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
 		<maven-surefire-report-plugin.version>2.19.1</maven-surefire-report-plugin.version>
+		<retrolambda-maven-plugin.version>2.3.0</retrolambda-maven-plugin.version>
 		<versions-maven-plugin.version>2.2</versions-maven-plugin.version>
 
 	</properties>
@@ -64,6 +66,23 @@
 		<pluginManagement>
 
 			<plugins>
+
+				<plugin>
+					<groupId>net.orfjackal.retrolambda</groupId>
+					<artifactId>retrolambda-maven-plugin</artifactId>
+					<version>${retrolambda-maven-plugin.version}</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>process-main</goal>
+								<goal>process-test</goal>
+							</goals>
+							<configuration>
+								<target>1.6</target>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
 
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -88,8 +107,8 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven-compiler-plugin.version}</version>
 					<configuration>
-						<source>1.6</source>
-						<target>1.6</target>
+						<source>1.8</source>
+						<target>1.8</target>
 						<compilerArgument>-Xlint:all,-processing</compilerArgument>
 						<showDeprecation>true</showDeprecation>
 						<showWarnings>true</showWarnings>
@@ -295,6 +314,19 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-report-plugin</artifactId>
 					<version>${maven-surefire-report-plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>animal-sniffer-maven-plugin</artifactId>
+					<version>${animal-sniffer-maven-plugin.version}</version>
+					<configuration>
+						<signature>
+							<groupId>org.codehaus.mojo.signature</groupId>
+							<artifactId>java16</artifactId>
+							<version>1.0</version>
+						</signature>
+					</configuration>
 				</plugin>
 
 				<plugin>

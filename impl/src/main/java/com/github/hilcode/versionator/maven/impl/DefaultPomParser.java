@@ -31,9 +31,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import com.github.hilcode.versionator.maven.Gav;
 import com.github.hilcode.versionator.maven.GroupArtifact;
+import com.github.hilcode.versionator.maven.GroupIdSource;
 import com.github.hilcode.versionator.maven.PomParser;
 import com.github.hilcode.versionator.maven.Property;
 import com.github.hilcode.versionator.maven.Type;
+import com.github.hilcode.versionator.maven.VersionSource;
+import com.github.hilcode.versionator.misc.Tuple;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -125,12 +128,12 @@ public final class DefaultPomParser
 	}
 
 	@Override
-	public String findGroupId(final Document pom)
+	public Tuple._2<GroupIdSource, String> findGroupId(final Document pom)
 	{
 		final Node groupIdNode = evaluateNode(this.groupIdExpr, pom);
 		return groupIdNode != null
-				? groupIdNode.getTextContent().trim()
-				: findParentGroupId(pom);
+				? new Tuple._2<>(GroupIdSource.GROUP_ID_SOURCE_IS_POM, groupIdNode.getTextContent().trim())
+				: new Tuple._2<>(GroupIdSource.GROUP_ID_SOURCE_IS_PARENT, findParentGroupId(pom));
 	}
 
 	@Override
@@ -140,12 +143,12 @@ public final class DefaultPomParser
 	}
 
 	@Override
-	public String findVersion(final Document pom)
+	public Tuple._2<VersionSource, String> findVersion(final Document pom)
 	{
 		final Node versionNode = evaluateNode(this.versionExpr, pom);
 		return versionNode != null
-				? versionNode.getTextContent().trim()
-				: findParentVersion(pom);
+				? new Tuple._2<>(VersionSource.VERSION_SOURCE_IS_POM, versionNode.getTextContent().trim())
+				: new Tuple._2<>(VersionSource.VERSION_SOURCE_IS_PARENT, findParentVersion(pom));
 	}
 
 	@Override
@@ -191,12 +194,15 @@ public final class DefaultPomParser
 	}
 
 	@Override
-	public Gav findGav(final Document pom)
+	public Tuple._3<GroupIdSource, VersionSource, Gav> findGav(final Document pom)
 	{
-		final String groupId = findGroupId(pom);
+		final Tuple._2<GroupIdSource, String> groupIdTuple = findGroupId(pom);
 		final String artifactId = findArtifactId(pom);
-		final String version = findVersion(pom);
-		return new Gav(new GroupArtifact(groupId, artifactId), version);
+		final Tuple._2<VersionSource, String> versionTuple = findVersion(pom);
+		return new Tuple._3<>(
+				groupIdTuple._1,
+				versionTuple._1,
+				new Gav(new GroupArtifact(groupIdTuple._2, artifactId), versionTuple._2));
 	}
 
 	@Override

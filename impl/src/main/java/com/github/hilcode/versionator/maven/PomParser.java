@@ -17,6 +17,7 @@ package com.github.hilcode.versionator.maven;
 
 import java.io.File;
 import org.w3c.dom.Document;
+import com.github.hilcode.versionator.misc.Tuple;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -32,11 +33,11 @@ public interface PomParser
 
 	String findParentRelativePath(Document pom);
 
-	String findGroupId(Document pom);
+	Tuple._2<GroupIdSource, String> findGroupId(Document pom);
 
 	String findArtifactId(Document pom);
 
-	String findVersion(Document pom);
+	Tuple._2<VersionSource, String> findVersion(Document pom);
 
 	Optional<Gav> findParentGav(Document pom);
 
@@ -44,7 +45,7 @@ public interface PomParser
 
 	ImmutableList<Property> findProperties(Document pom);
 
-	Gav findGav(Document pom);
+	Tuple._3<GroupIdSource, VersionSource, Gav> findGav(Document pom);
 
 	Type findType(Document pom);
 

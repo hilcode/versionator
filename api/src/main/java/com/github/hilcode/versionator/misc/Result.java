@@ -21,7 +21,7 @@ public final class Result<F, S>
 {
 	public static final <F, S> Result<F, S> success(final S value)
 	{
-		return new Result<F, S>(null, value);
+		return new Result<>(null, value);
 	}
 
 	public static final <ANY, F, S> Result<F, S> asSuccess(final Result<ANY, S> result)
@@ -34,7 +34,7 @@ public final class Result<F, S>
 
 	public static final <F, S> Result<F, S> failure(final F value)
 	{
-		return new Result<F, S>(value, null);
+		return new Result<>(value, null);
 	}
 
 	public static final <ANY, F, S> Result<F, S> asFailure(final Result<F, ANY> result)
@@ -46,6 +46,7 @@ public final class Result<F, S>
 	}
 
 	private final F failure;
+
 	private final S success;
 
 	private Result(final F failure, final S success)

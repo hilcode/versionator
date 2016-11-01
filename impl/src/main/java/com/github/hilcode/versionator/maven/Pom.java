@@ -27,6 +27,10 @@ public final class Pom
 {
 	public final Gav gav;
 
+	public final GroupIdSource groupIdSource;
+
+	public final VersionSource versionSource;
+
 	public final File file;
 
 	public final Type type;
@@ -41,6 +45,8 @@ public final class Pom
 
 	public Pom(
 			final Gav gav,
+			final GroupIdSource groupIdSource,
+			final VersionSource versionSource,
 			final File file,
 			final Type type,
 			final Optional<Pom> parent,
@@ -49,6 +55,8 @@ public final class Pom
 			final ImmutableList<Gav> dependencies)
 	{
 		Preconditions.checkNotNull(gav, "Missing 'gav'.");
+		Preconditions.checkNotNull(groupIdSource, "Missing 'groupIdSource'.");
+		Preconditions.checkNotNull(versionSource, "Missing 'versionSource'.");
 		Preconditions.checkNotNull(file, "Missing 'file'.");
 		Preconditions.checkNotNull(type, "Missing 'type'.");
 		Preconditions.checkNotNull(parent, "Missing 'parent'.");
@@ -56,6 +64,8 @@ public final class Pom
 		Preconditions.checkNotNull(properties, "Missing 'properties'.");
 		Preconditions.checkNotNull(dependencies, "Missing 'dependencies'.");
 		this.gav = gav;
+		this.groupIdSource = groupIdSource;
+		this.versionSource = versionSource;
 		this.file = file;
 		this.type = type;
 		this.parent = parent;
@@ -70,6 +80,8 @@ public final class Pom
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + this.gav.hashCode();
+		result = prime * result + this.groupIdSource.hashCode();
+		result = prime * result + this.versionSource.hashCode();
 		result = prime * result + this.file.hashCode();
 		result = prime * result + this.type.hashCode();
 		result = prime * result + this.parent.hashCode();
@@ -104,6 +116,8 @@ public final class Pom
 		return ComparisonChain
 				.start()
 				.compare(this.gav, other.gav)
+				.compare(this.groupIdSource, other.groupIdSource)
+				.compare(this.versionSource, other.versionSource)
 				.compare(this.file, other.file)
 				.compare(this.type, other.type)
 				.compare(this.parent, other.parent, OptionalComparator.<Pom> instance())
@@ -119,6 +133,8 @@ public final class Pom
 		final StringBuilder builder = new StringBuilder();
 		builder.append("(Pom");
 		builder.append(" gav=").append(this.gav);
+		builder.append(" groupIdSource=").append(this.groupIdSource);
+		builder.append(" versionSource=").append(this.versionSource);
 		builder.append(" file='").append(this.file).append("'");
 		builder.append(" type=").append(this.type);
 		builder.append(" parent=").append(this.parent);
