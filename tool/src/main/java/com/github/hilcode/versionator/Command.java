@@ -19,7 +19,7 @@ import java.io.File;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
-public final class Command
+public interface Command
 {
 	public static enum Verbosity
 	{
@@ -108,7 +108,7 @@ public final class Command
 			Preconditions.checkNotNull(interactivity, "Missing 'interactivity'.");
 			Preconditions.checkNotNull(colour, "Missing 'colour'.");
 			Preconditions.checkNotNull(key, "Missing 'key'.");
-			Preconditions.checkArgument(key.length() > 0, "Empty 'key'.");
+			Preconditions.checkArgument(key.trim().length() > 0, "Empty 'key'.");
 			Preconditions.checkNotNull(value, "Missing 'value'.");
 			Preconditions.checkNotNull(gavs, "Missing 'gavs'.");
 			this.rootDir = rootDir;

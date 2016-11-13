@@ -24,9 +24,16 @@ public final class ArtifactId
 	implements
 		Comparable<ArtifactId>
 {
-	private final String value;
+	public static final ArtifactId NONE = new ArtifactId();
 
-	private ArtifactId(final String value)
+	final String value;
+
+	private ArtifactId()
+	{
+		this.value = "";
+	}
+
+	ArtifactId(final String value)
 	{
 		Preconditions.checkNotNull(value, "Missing 'value'.");
 		final String value_ = value.trim();
@@ -61,10 +68,17 @@ public final class ArtifactId
 	@Override
 	public int compareTo(final ArtifactId other)
 	{
-		return ComparisonChain
-				.start()
-				.compare(this.value, other.value)
-				.result();
+		if (this == NONE)
+		{
+			return other == NONE ? 0 : -1;
+		}
+		else
+		{
+			return ComparisonChain
+					.start()
+					.compare(this.value, other.value)
+					.result();
+		}
 	}
 
 	public String toText()
@@ -75,11 +89,18 @@ public final class ArtifactId
 	@Override
 	public String toString()
 	{
-		final StringBuilder builder = new StringBuilder();
-		builder.append("(ArtifactId");
-		builder.append(" value='").append(this.value).append("'");
-		builder.append(")");
-		return builder.toString();
+		if (this == NONE)
+		{
+			return "(ArtifactId NONE)";
+		}
+		else
+		{
+			final StringBuilder builder = new StringBuilder();
+			builder.append("(ArtifactId");
+			builder.append(" value='").append(this.value).append("'");
+			builder.append(")");
+			return builder.toString();
+		}
 	}
 
 	public interface Builder

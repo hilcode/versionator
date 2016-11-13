@@ -25,13 +25,13 @@
 	<parent>
 		<groupId>com.github.hilcode</groupId>
 		<artifactId>versionator-pom</artifactId>
-		<version>3</version>
+		<version>4-SNAPSHOT</version>
 		<relativePath>../poms</relativePath>
 	</parent>
 
 	<groupId>com.github.hilcode</groupId>
 	<artifactId>versionator-impl</artifactId>
-	<version>0.0.4</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Versionator IMPL</name>
@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>com.github.hilcode</groupId>
 			<artifactId>versionator-api</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.5-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -113,11 +113,6 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>animal-sniffer-maven-plugin</artifactId>
-			</plugin>
-
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
 			</plugin>
 
 		</plugins>

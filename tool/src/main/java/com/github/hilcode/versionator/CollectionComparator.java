@@ -34,6 +34,11 @@ public final class CollectionComparator<T extends Comparable<T>>
 		return instance;
 	}
 
+	CollectionComparator()
+	{
+		// Empty.
+	}
+
 	@Override
 	public int compare(final Collection<T> as, final Collection<T> bs)
 	{

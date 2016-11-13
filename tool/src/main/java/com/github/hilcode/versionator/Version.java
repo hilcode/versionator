@@ -27,11 +27,64 @@ public interface Version
 	extends
 		Comparable<Version>
 {
+	Version NONE = new Version()
+	{
+		@Override
+		public int compareTo(final Version other)
+		{
+			return other == NONE ? 0 : -1;
+		}
+
+		@Override
+		public String toText()
+		{
+			return "";
+		}
+
+		@Override
+		public boolean isSnapshot()
+		{
+			return false;
+		}
+
+		@Override
+		public boolean isRelease()
+		{
+			return false;
+		}
+
+		@Override
+		public boolean hasPropertyValue()
+		{
+			return false;
+		}
+
+		@Override
+		public Version toRelease()
+		{
+			return NONE;
+		}
+
+		@Override
+		public Version toSnapshot()
+		{
+			return NONE;
+		}
+
+		@Override
+		public Version next()
+		{
+			return NONE;
+		}
+	};
+
 	String toText();
 
 	boolean isSnapshot();
 
 	boolean isRelease();
+
+	boolean hasPropertyValue();
 
 	Version toRelease();
 
@@ -211,6 +264,12 @@ public interface Version
 			}
 
 			@Override
+			public boolean hasPropertyValue()
+			{
+				return false;
+			}
+
+			@Override
 			public int compareTo(final Version other)
 			{
 				if (other instanceof DefaultNumber)
@@ -279,7 +338,7 @@ public interface Version
 			@Override
 			public String toString()
 			{
-				return "(DefaultNumber major='" + major + "' snapshot=" + snapshot + ")";
+				return "(Version major='" + major + "' snapshot=" + snapshot + ")";
 			}
 		}
 
@@ -361,6 +420,12 @@ public interface Version
 			}
 
 			@Override
+			public boolean hasPropertyValue()
+			{
+				return false;
+			}
+
+			@Override
 			public int compareTo(final Version other)
 			{
 				if (other instanceof DefaultNumber)
@@ -433,7 +498,7 @@ public interface Version
 			@Override
 			public String toString()
 			{
-				return "(DefaultCommon major='" + major + "' minor='" + minor + "' micro='" + micro + "' snapshot=" + snapshot + ")";
+				return "(Version major='" + major + "' minor='" + minor + "' micro='" + micro + "' snapshot=" + snapshot + ")";
 			}
 		}
 
@@ -519,6 +584,12 @@ public interface Version
 			}
 
 			@Override
+			public boolean hasPropertyValue()
+			{
+				return versionAsText.startsWith("${") && versionAsText.endsWith("}");
+			}
+
+			@Override
 			public int compareTo(final Version other)
 			{
 				if (isRelease() && other.isRelease() || isSnapshot() && other.isSnapshot())
@@ -564,7 +635,7 @@ public interface Version
 			@Override
 			public String toString()
 			{
-				return "(DefaultUnusual versionAsText='" + versionAsText + "' snapshot=" + snapshot + ")";
+				return "(Version versionAsText='" + versionAsText + "' snapshot=" + snapshot + ")";
 			}
 		}
 	};

@@ -25,13 +25,13 @@
 	<parent>
 		<groupId>com.github.hilcode</groupId>
 		<artifactId>versionator-pom</artifactId>
-		<version>3</version>
+		<version>4-SNAPSHOT</version>
 		<relativePath>../poms</relativePath>
 	</parent>
 
 	<groupId>com.github.hilcode</groupId>
 	<artifactId>versionator-integration-tests</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Versionator Integration Tests</name>
@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>com.github.hilcode</groupId>
 			<artifactId>versionator-tool</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.5-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -85,11 +85,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-			</plugin>
-
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
 			</plugin>
 
 		</plugins>

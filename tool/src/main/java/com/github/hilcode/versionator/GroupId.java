@@ -24,9 +24,16 @@ public final class GroupId
 	implements
 		Comparable<GroupId>
 {
-	private final String value;
+	public static final GroupId NONE = new GroupId();
 
-	private GroupId(final String value)
+	final String value;
+
+	private GroupId()
+	{
+		this.value = "";
+	}
+
+	GroupId(final String value)
 	{
 		Preconditions.checkNotNull(value, "Missing 'value'.");
 		final String value_ = value.trim();
@@ -61,10 +68,17 @@ public final class GroupId
 	@Override
 	public int compareTo(final GroupId other)
 	{
-		return ComparisonChain
-				.start()
-				.compare(this.value, other.value)
-				.result();
+		if (this == NONE)
+		{
+			return other == NONE ? 0 : -1;
+		}
+		else
+		{
+			return ComparisonChain
+					.start()
+					.compare(this.value, other.value)
+					.result();
+		}
 	}
 
 	public String toText()
@@ -75,11 +89,18 @@ public final class GroupId
 	@Override
 	public String toString()
 	{
-		final StringBuilder builder = new StringBuilder();
-		builder.append("(GroupId");
-		builder.append(" value='").append(this.value).append("'");
-		builder.append(")");
-		return builder.toString();
+		if (this == NONE)
+		{
+			return "(GroupId NONE)";
+		}
+		else
+		{
+			final StringBuilder builder = new StringBuilder();
+			builder.append("(GroupId");
+			builder.append(" value='").append(this.value).append("'");
+			builder.append(")");
+			return builder.toString();
+		}
 	}
 
 	public interface Builder

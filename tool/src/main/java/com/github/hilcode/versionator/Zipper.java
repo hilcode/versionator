@@ -20,15 +20,15 @@ import java.util.Iterator;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
-public final class Zipper<T>
+public final class Zipper<A, B>
 	implements
-		Iterable<Tuple._2<T, T>>
+		Iterable<Tuple.Duo<A, B>>
 {
-	private final Collection<T> a;
+	final Collection<A> a;
 
-	private final Collection<T> b;
+	final Collection<B> b;
 
-	private Zipper(final Collection<T> a, final Collection<T> b)
+	Zipper(final Collection<A> a, final Collection<B> b)
 	{
 		Preconditions.checkNotNull(a, "Missing 'a'.");
 		Preconditions.checkNotNull(b, "Missing 'b'.");
@@ -37,14 +37,14 @@ public final class Zipper<T>
 	}
 
 	@Override
-	public Iterator<Tuple._2<T, T>> iterator()
+	public Iterator<Tuple.Duo<A, B>> iterator()
 	{
-		final ImmutableList.Builder<Tuple._2<T, T>> zipper = ImmutableList.builder();
-		final Iterator<T> as = this.a.iterator();
-		final Iterator<T> bs = this.b.iterator();
+		final ImmutableList.Builder<Tuple.Duo<A, B>> zipper = ImmutableList.builder();
+		final Iterator<A> as = this.a.iterator();
+		final Iterator<B> bs = this.b.iterator();
 		while (as.hasNext() && bs.hasNext())
 		{
-			final Tuple._2<T, T> tuple = new Tuple._2<>(as.next(), bs.next());
+			final Tuple.Duo<A, B> tuple = new Tuple.Duo<>(as.next(), bs.next());
 			zipper.add(tuple);
 		}
 		return zipper.build().iterator();
@@ -52,13 +52,13 @@ public final class Zipper<T>
 
 	public interface Builder
 	{
-		<T> Zipper<T> zip(Collection<T> a, Collection<T> b);
+		<A, B> Zipper<A, B> zip(Collection<A> a, Collection<B> b);
 	}
 
 	public static final Zipper.Builder BUILDER = new Builder()
 	{
 		@Override
-		public <T> Zipper<T> zip(final Collection<T> a, final Collection<T> b)
+		public <A, B> Zipper<A, B> zip(final Collection<A> a, final Collection<B> b)
 		{
 			return new Zipper<>(a, b);
 		}

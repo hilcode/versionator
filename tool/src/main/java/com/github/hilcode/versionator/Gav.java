@@ -24,22 +24,23 @@ public final class Gav
 	implements
 		Comparable<Gav>
 {
+	public static final Gav NONE = new Gav();
+
 	public final GroupArtifact groupArtifact;
 
 	public final Version version;
 
-	private Gav(final GroupArtifact groupArtifact, final Version version)
+	private Gav()
+	{
+		this(GroupArtifact.NONE, Version.NONE);
+	}
+
+	Gav(final GroupArtifact groupArtifact, final Version version)
 	{
 		Preconditions.checkNotNull(groupArtifact, "Missing 'groupArtifact'.");
 		Preconditions.checkNotNull(version, "Missing 'version'.");
 		this.groupArtifact = groupArtifact;
 		this.version = version;
-	}
-
-	public Gav apply(final Version newVersion)
-	{
-		Preconditions.checkNotNull(newVersion, "Missing 'newVersion'.");
-		return BUILDER.build(this.groupArtifact, newVersion);
 	}
 
 	public String toText()
@@ -50,11 +51,18 @@ public final class Gav
 	@Override
 	public int compareTo(final Gav other)
 	{
-		return ComparisonChain
-				.start()
-				.compare(this.groupArtifact, other.groupArtifact)
-				.compare(this.version, other.version)
-				.result();
+		if (this == NONE)
+		{
+			return other == NONE ? 0 : -1;
+		}
+		else
+		{
+			return ComparisonChain
+					.start()
+					.compare(this.groupArtifact, other.groupArtifact)
+					.compare(this.version, other.version)
+					.result();
+		}
 	}
 
 	@Override
@@ -85,12 +93,19 @@ public final class Gav
 	@Override
 	public String toString()
 	{
-		final StringBuilder builder = new StringBuilder();
-		builder.append("(Gav");
-		builder.append(" groupArtifact=").append(this.groupArtifact);
-		builder.append(" version=").append(this.version);
-		builder.append(")");
-		return builder.toString();
+		if (this == NONE)
+		{
+			return "(Gav NONE)";
+		}
+		else
+		{
+			final StringBuilder builder = new StringBuilder();
+			builder.append("(Gav");
+			builder.append(" groupArtifact=").append(this.groupArtifact);
+			builder.append(" version=").append(this.version);
+			builder.append(")");
+			return builder.toString();
+		}
 	}
 
 	public interface Builder

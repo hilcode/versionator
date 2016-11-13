@@ -24,11 +24,18 @@ public final class GroupArtifact
 	implements
 		Comparable<GroupArtifact>
 {
+	public static final GroupArtifact NONE = new GroupArtifact();
+
 	public final GroupId groupId;
 
 	public final ArtifactId artifactId;
 
-	private GroupArtifact(final GroupId groupId, final ArtifactId artifactId)
+	private GroupArtifact()
+	{
+		this(GroupId.NONE, ArtifactId.NONE);
+	}
+
+	GroupArtifact(final GroupId groupId, final ArtifactId artifactId)
 	{
 		Preconditions.checkNotNull(groupId, "Missing 'groupId'.");
 		Preconditions.checkNotNull(artifactId, "Missing 'artifactId'.");
@@ -64,11 +71,18 @@ public final class GroupArtifact
 	@Override
 	public int compareTo(final GroupArtifact other)
 	{
-		return ComparisonChain
-				.start()
-				.compare(this.groupId, other.groupId)
-				.compare(this.artifactId, other.artifactId)
-				.result();
+		if (this == NONE)
+		{
+			return other == NONE ? 0 : -1;
+		}
+		else
+		{
+			return ComparisonChain
+					.start()
+					.compare(this.groupId, other.groupId)
+					.compare(this.artifactId, other.artifactId)
+					.result();
+		}
 	}
 
 	public String toText()
@@ -79,12 +93,19 @@ public final class GroupArtifact
 	@Override
 	public String toString()
 	{
-		final StringBuilder builder = new StringBuilder();
-		builder.append("(GroupArtifact");
-		builder.append(" groupId=").append(this.groupId);
-		builder.append(" artifactId=").append(this.artifactId);
-		builder.append(")");
-		return builder.toString();
+		if (this == NONE)
+		{
+			return "(GroupArtifact NONE)";
+		}
+		else
+		{
+			final StringBuilder builder = new StringBuilder();
+			builder.append("(GroupArtifact");
+			builder.append(" groupId=").append(this.groupId);
+			builder.append(" artifactId=").append(this.artifactId);
+			builder.append(")");
+			return builder.toString();
+		}
 	}
 
 	public interface Builder

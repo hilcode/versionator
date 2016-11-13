@@ -17,16 +17,26 @@ package com.github.hilcode.versionator;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Interner;
+import com.google.common.collect.Interners;
 
 public final class PomAndGav
 	implements
 		Comparable<PomAndGav>
 {
+	public static final PomAndGav NONE = new PomAndGav();
+
 	public final Pom pom;
 
 	public final Gav gav;
 
-	public PomAndGav(final Pom pom, final Gav gav)
+	private PomAndGav()
+	{
+		this.pom = Pom.NONE;
+		this.gav = Gav.NONE;
+	}
+
+	PomAndGav(final Pom pom, final Gav gav)
 	{
 		Preconditions.checkNotNull(pom, "Missing 'pom'.");
 		Preconditions.checkNotNull(gav, "Missing 'gav'.");
@@ -62,21 +72,51 @@ public final class PomAndGav
 	@Override
 	public int compareTo(final PomAndGav other)
 	{
-		return ComparisonChain
-				.start()
-				.compare(this.pom, other.pom)
-				.compare(this.gav, other.gav)
-				.result();
+		if (this == NONE)
+		{
+			return other == NONE ? 0 : -1;
+		}
+		else
+		{
+			return ComparisonChain
+					.start()
+					.compare(this.pom, other.pom)
+					.compare(this.gav, other.gav)
+					.result();
+		}
 	}
 
 	@Override
 	public String toString()
 	{
-		final StringBuilder builder = new StringBuilder();
-		builder.append("(GavAndPom");
-		builder.append(" pom=").append(this.pom);
-		builder.append(" gav=").append(this.gav);
-		builder.append(")");
-		return builder.toString();
+		if (this == NONE)
+		{
+			return "(PomAndGav NONE)";
+		}
+		else
+		{
+			final StringBuilder builder = new StringBuilder();
+			builder.append("(PomAndGav");
+			builder.append(" pom=").append(this.pom);
+			builder.append(" gav=").append(this.gav);
+			builder.append(")");
+			return builder.toString();
+		}
 	}
+
+	public interface Builder
+	{
+		PomAndGav build(Pom pom, Gav gav);
+	}
+
+	public static final Builder BUILDER = new Builder()
+	{
+		private final Interner<PomAndGav> interner = Interners.newWeakInterner();
+
+		@Override
+		public PomAndGav build(final Pom pom, final Gav gav)
+		{
+			return this.interner.intern(new PomAndGav(pom, gav));
+		}
+	};
 }

@@ -17,6 +17,6 @@ package com.github.hilcode.versionator;
 
 public enum GroupIdSource
 {
-	GROUP_ID_SOURCE_IS_POM,
-	GROUP_ID_SOURCE_IS_PARENT
+	POM,
+	PARENT
 }

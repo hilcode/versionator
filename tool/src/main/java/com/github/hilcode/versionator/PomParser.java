@@ -32,11 +32,11 @@ public interface PomParser
 
 	String findParentRelativePath(Document pom);
 
-	Tuple._2<GroupIdSource, String> findGroupId(Document pom);
+	Tuple.Duo<GroupIdSource, String> findGroupId(Document pom);
 
 	String findArtifactId(Document pom);
 
-	Tuple._2<VersionSource, String> findVersion(Document pom);
+	Tuple.Duo<VersionSource, String> findVersion(Document pom);
 
 	Optional<Gav> findParentGav(Document pom);
 
@@ -44,7 +44,7 @@ public interface PomParser
 
 	ImmutableList<Property> findProperties(Document pom);
 
-	Tuple._3<GroupIdSource, VersionSource, Gav> findGav(Document pom);
+	Tuple.Triple<GroupIdSource, VersionSource, Gav> findGav(Document pom);
 
 	Type findType(Document pom);
 

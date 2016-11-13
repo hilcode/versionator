@@ -16,11 +16,13 @@
 package com.github.hilcode.versionator;
 
 import java.io.File;
+import com.google.common.base.Preconditions;
 
 public final class PomFinderUtils
 {
 	public static final File toCanonical(final File file)
 	{
+		Preconditions.checkNotNull(file, "Missing 'file'.");
 		try
 		{
 			return file.getCanonicalFile();

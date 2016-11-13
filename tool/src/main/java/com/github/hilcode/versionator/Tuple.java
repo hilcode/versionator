@@ -15,52 +15,50 @@
  */
 package com.github.hilcode.versionator;
 
-public final class Tuple
+public abstract class Tuple<A>
 {
-	public static final class _2<A, B>
-	{
-		public final A _1;
+	public final A _1;
 
+	public Tuple(final A a)
+	{
+		this._1 = a;
+	}
+
+	public static class Duo<A, B>
+		extends
+			Tuple<A>
+	{
 		public final B _2;
 
-		public _2(final A a, final B b)
+		public Duo(final A a, final B b)
 		{
-			this._1 = a;
+			super(a);
 			this._2 = b;
 		}
 	}
 
-	public static final class _3<A, B, C>
+	public static class Triple<A, B, C>
+		extends
+			Duo<A, B>
 	{
-		public final A _1;
-
-		public final B _2;
-
 		public final C _3;
 
-		public _3(final A a, final B b, final C c)
+		public Triple(final A a, final B b, final C c)
 		{
-			this._1 = a;
-			this._2 = b;
+			super(a, b);
 			this._3 = c;
 		}
 	}
 
-	public static final class _4<A, B, C, D>
+	public static class Quartet<A, B, C, D>
+		extends
+			Triple<A, B, C>
 	{
-		public final A _1;
-
-		public final B _2;
-
-		public final C _3;
-
 		public final D _4;
 
-		public _4(final A a, final B b, final C c, final D d)
+		public Quartet(final A a, final B b, final C c, final D d)
 		{
-			this._1 = a;
-			this._2 = b;
-			this._3 = c;
+			super(a, b, c);
 			this._4 = d;
 		}
 	}

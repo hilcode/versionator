@@ -60,6 +60,18 @@ public final class VersionSetter
 		}
 	}
 
+	public static final String toNormalizedString(final VTDNav vtdNavigator, final int index)
+	{
+		try
+		{
+			return vtdNavigator.toNormalizedString(index);
+		}
+		catch (final Exception e)
+		{
+			throw new IllegalStateException(e.getMessage(), e);
+		}
+	}
+
 	public static final void updateToken(final XMLModifier xmlModifier, final int index, final String text)
 	{
 		try
@@ -87,6 +99,7 @@ public final class VersionSetter
 
 	public void updateAll(final File pomFile, final Gav gav)
 	{
+		System.err.println("GAV = '" + gav.toText() + "'");
 		final String xpath = String.format(
 				"//*[normalize-space(normalize-space(child::groupId='%s')) and normalize-space(normalize-space(child::artifactId))='%s']/version/text()",
 				gav.groupArtifact.groupId.toText(),
@@ -106,7 +119,10 @@ public final class VersionSetter
 				{
 					break;
 				}
-				updateToken(xmlModifier, index, gav.version.toText());
+				if (!hasPropertyValue(vtdNavigator, index))
+				{
+					updateToken(xmlModifier, index, gav.version.toText());
+				}
 			}
 			output(xmlModifier, pomFile);
 		}
@@ -114,5 +130,11 @@ public final class VersionSetter
 		{
 			throw new IllegalStateException(String.format("Unable to parse '%s'.", pomFile.getPath()));
 		}
+	}
+
+	public boolean hasPropertyValue(final VTDNav vtdNavigator, final int index)
+	{
+		final String value = toNormalizedString(vtdNavigator, index);
+		return value.startsWith("${") && value.endsWith("}");
 	}
 }

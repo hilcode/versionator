@@ -24,7 +24,7 @@
 
 	<groupId>com.github.hilcode</groupId>
 	<artifactId>versionator-pom</artifactId>
-	<version>3</version>
+	<version>4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Versionator POM</name>
@@ -36,7 +36,7 @@
 
 		<animal-sniffer-maven-plugin.version>1.15</animal-sniffer-maven-plugin.version>
 		<build-helper-maven-plugin.version>1.12</build-helper-maven-plugin.version>
-		<jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
+		<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
 		<maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
 		<maven-assembly-plugin.version>2.6</maven-assembly-plugin.version>
 		<maven-clean-plugin.version>3.0.0</maven-clean-plugin.version>
@@ -273,9 +273,9 @@
 								<version>${maven-surefire-report-plugin.version}</version>
 							</plugin>
 							<plugin>
-								<groupId>org.jacoco</groupId>
-								<artifactId>jacoco-maven-plugin</artifactId>
-								<version>${jacoco-maven-plugin.version}</version>
+								<groupId>org.codehaus.mojo</groupId>
+								<artifactId>cobertura-maven-plugin</artifactId>
+								<version>${cobertura-maven-plugin.version}</version>
 							</plugin>
 							<plugin>
 								<groupId>org.codehaus.mojo</groupId>
@@ -337,34 +337,34 @@
 
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>versions-maven-plugin</artifactId>
-					<version>${versions-maven-plugin.version}</version>
+					<artifactId>cobertura-maven-plugin</artifactId>
+					<version>${cobertura-maven-plugin.version}</version>
+					<configuration>
+						<formats>
+							<format>html</format>
+							<format>xml</format>
+						</formats>
+					</configuration>
 				</plugin>
 
 				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>${jacoco-maven-plugin.version}</version>
-					<executions>
-						<execution>
-							<id>prepare-agent</id>
-							<goals>
-								<goal>prepare-agent</goal>
-							</goals>
-						</execution>
-						<execution>
-							<id>report</id>
-							<phase>site</phase>
-							<goals>
-								<goal>report</goal>
-							</goals>
-						</execution>
-					</executions>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>versions-maven-plugin</artifactId>
+					<version>${versions-maven-plugin.version}</version>
 				</plugin>
 
 			</plugins>
 
 		</pluginManagement>
+
+		<plugins>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+			</plugin>
+
+		</plugins>
 
 	</build>
 
@@ -394,6 +394,7 @@
 					<reportSet>
 						<reports>
 							<report>cim</report>
+							<report>maven-cobertura-plugin</report>
 							<report>dependencies</report>
 							<report>dependency-convergence</report>
 							<report>dependency-management</report>
@@ -414,6 +415,12 @@
 
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>${cobertura-maven-plugin.version}</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>versions-maven-plugin</artifactId>
 				<version>${versions-maven-plugin.version}</version>
 				<reportSets>
@@ -422,19 +429,6 @@
 							<report>dependency-updates-report</report>
 							<report>plugin-updates-report</report>
 							<report>property-updates-report</report>
-						</reports>
-					</reportSet>
-				</reportSets>
-			</plugin>
-
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>${jacoco-maven-plugin.version}</version>
-				<reportSets>
-					<reportSet>
-						<reports>
-							<report>report</report>
 						</reports>
 					</reportSet>
 				</reportSets>

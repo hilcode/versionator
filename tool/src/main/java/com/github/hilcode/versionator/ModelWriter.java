@@ -40,28 +40,36 @@ public class ModelWriter
 		final File tempDir = Files.createTempDir();
 		tempDir.deleteOnExit();
 		final ImmutableMap.Builder<Pom, File> pomToFileMapBuilder = ImmutableMap.builder();
-		final Zipper<Pom> pomZipper = Zipper.BUILDER.zip(original.poms, result.poms);
-		for (final Tuple._2<Pom, Pom> tuple : pomZipper)
+		final Zipper<Pom, Pom> pomZipper = Zipper.BUILDER.zip(original.poms, result.poms);
+		for (final Tuple.Duo<Pom, Pom> tuple : pomZipper)
 		{
 			final Pom originalPom = tuple._1;
 			final Pom resultPom = tuple._2;
 			if (originalPom != resultPom)
 			{
+				System.err.println("POM " + originalPom.gav.toText() + " changed");
 				final File pomFile = new File(tempDir, originalPom.gav.groupArtifact.toText() + ".xml");
 				pomToFileMapBuilder.put(originalPom, pomFile);
 				copy(originalPom.file, pomFile);
-				if (originalPom.parent.isPresent())
+				if (originalPom.parent != Pom.NONE)
 				{
-					this.versionSetter.updateAll(pomFile, resultPom.parent.get().gav);
+					System.err.println("POM " + originalPom.gav.toText() + ": change parent to " + resultPom.parent.gav.toText());
+					this.versionSetter.updateAll(pomFile, resultPom.parent.gav);
 				}
 				for (final Dependency dependency : resultPom.dependencies)
 				{
-					this.versionSetter.updateAll(pomFile, dependency.gav);
+					if (!dependency.gav.version.hasPropertyValue())
+					{
+						System.err.println("POM " + originalPom.gav.toText() + ": change dependency to " + dependency.gav.toText());
+						this.versionSetter.updateAll(pomFile, dependency.gav);
+					}
 				}
 				for (final Property property : resultPom.properties)
 				{
+					System.err.println("POM " + originalPom.gav.toText() + ": change property to " + property);
 					this.propertySetter.updateProperty(pomFile, property);
 				}
+				System.err.println("POM " + originalPom.gav.toText() + ": change GAV to " + resultPom.gav.toText());
 				this.versionSetter.updateAll(pomFile, resultPom.gav);
 				copy(pomFile, originalPom.file);
 				pomFile.delete();

@@ -53,7 +53,7 @@ public final class DefaultPomFinder
 	public void findPoms(final Map<GroupArtifact, Pom> map, final File pomFile)
 	{
 		final Document pomDocument = this.pomParser.toDocument(pomFile);
-		final Tuple._3<GroupIdSource, VersionSource, Gav> gavTuple = this.pomParser.findGav(pomDocument);
+		final Tuple.Triple<GroupIdSource, VersionSource, Gav> gavTuple = this.pomParser.findGav(pomDocument);
 		final ImmutableList<String> modules = this.pomParser.findModules(pomDocument);
 		final Pom pom = Pom.BUILDER.build(
 				gavTuple._3,
@@ -73,7 +73,7 @@ public final class DefaultPomFinder
 		}
 	}
 
-	public Optional<Pom> findParentPom(
+	public Pom findParentPom(
 			final Map<GroupArtifact, Pom> map,
 			final File pomFile,
 			final Optional<Gav> parentGav,
@@ -87,11 +87,11 @@ public final class DefaultPomFinder
 				final File parentDir = new File(pomFile.getParentFile(), this.pomParser.findParentRelativePath(pomDocument));
 				findPoms(map, parentDir.isFile() ? parentDir : new File(parentDir, "pom.xml"));
 			}
-			return Optional.of(map.get(parentGroupArtifact));
+			return map.get(parentGroupArtifact);
 		}
 		else
 		{
-			return Optional.absent();
+			return Pom.NONE;
 		}
 	}
 }

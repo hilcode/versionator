@@ -25,13 +25,13 @@
 	<parent>
 		<groupId>com.github.hilcode</groupId>
 		<artifactId>versionator-pom</artifactId>
-		<version>3</version>
+		<version>4-SNAPSHOT</version>
 		<relativePath>../poms</relativePath>
 	</parent>
 
 	<groupId>com.github.hilcode</groupId>
 	<artifactId>versionator-tool</artifactId>
-	<version>0.0.4</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Versionator Tool</name>
@@ -42,13 +42,13 @@
 		<dependency>
 			<groupId>com.github.hilcode</groupId>
 			<artifactId>versionator-api</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.5-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.github.hilcode</groupId>
 			<artifactId>versionator-impl</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.5-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -83,6 +83,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>2.2.26</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -110,7 +117,7 @@
 									<format
 										property="timestamp"
 										timezone="UTC"
-										pattern="yyyy-MM-dd HH:mm:ss z"/>
+										pattern="yyyy-MM-dd HH:mm:ss"/>
 								</tstamp>
 								<filter token="VERSION" value="${project.version}"/>
 								<filter token="RELEASE_DATE" value="${timestamp}"/>
@@ -187,11 +194,6 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
 			</plugin>
 
 		</plugins>

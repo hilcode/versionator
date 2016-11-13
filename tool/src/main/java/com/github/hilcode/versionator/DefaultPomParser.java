@@ -126,12 +126,12 @@ public final class DefaultPomParser
 	}
 
 	@Override
-	public Tuple._2<GroupIdSource, String> findGroupId(final Document pom)
+	public Tuple.Duo<GroupIdSource, String> findGroupId(final Document pom)
 	{
 		final Node groupIdNode = evaluateNode(this.groupIdExpr, pom);
 		return groupIdNode != null
-				? new Tuple._2<>(GroupIdSource.GROUP_ID_SOURCE_IS_POM, groupIdNode.getTextContent().trim())
-				: new Tuple._2<>(GroupIdSource.GROUP_ID_SOURCE_IS_PARENT, findParentGroupId(pom));
+				? new Tuple.Duo<>(GroupIdSource.POM, groupIdNode.getTextContent().trim())
+				: new Tuple.Duo<>(GroupIdSource.PARENT, findParentGroupId(pom));
 	}
 
 	@Override
@@ -141,12 +141,12 @@ public final class DefaultPomParser
 	}
 
 	@Override
-	public Tuple._2<VersionSource, String> findVersion(final Document pom)
+	public Tuple.Duo<VersionSource, String> findVersion(final Document pom)
 	{
 		final Node versionNode = evaluateNode(this.versionExpr, pom);
 		return versionNode != null
-				? new Tuple._2<>(VersionSource.POM, versionNode.getTextContent().trim())
-				: new Tuple._2<>(VersionSource.PARENT, findParentVersion(pom));
+				? new Tuple.Duo<>(VersionSource.POM, versionNode.getTextContent().trim())
+				: new Tuple.Duo<>(VersionSource.PARENT, findParentVersion(pom));
 	}
 
 	@Override
@@ -199,12 +199,12 @@ public final class DefaultPomParser
 	}
 
 	@Override
-	public Tuple._3<GroupIdSource, VersionSource, Gav> findGav(final Document pom)
+	public Tuple.Triple<GroupIdSource, VersionSource, Gav> findGav(final Document pom)
 	{
-		final Tuple._2<GroupIdSource, String> groupIdTuple = findGroupId(pom);
+		final Tuple.Duo<GroupIdSource, String> groupIdTuple = findGroupId(pom);
 		final String artifactId = findArtifactId(pom);
-		final Tuple._2<VersionSource, String> versionTuple = findVersion(pom);
-		return new Tuple._3<>(
+		final Tuple.Duo<VersionSource, String> versionTuple = findVersion(pom);
+		return new Tuple.Triple<>(
 				groupIdTuple._1,
 				versionTuple._1,
 				Gav.BUILDER.build(

@@ -61,9 +61,9 @@ public final class ListExecutor
 		final Set<PomAndGav> pomAndGavs = Sets.newConcurrentHashSet();
 		for (final Pom pom : poms)
 		{
-			if (pom.parent.isPresent())
+			if (pom.parent != Pom.NONE)
 			{
-				final Pom parent = pom.parent.get();
+				final Pom parent = pom.parent;
 				boolean includeGav = this.commandList.patterns.get(0).startsWith("!");
 				for (final String pattern : this.commandList.patterns)
 				{
@@ -86,7 +86,7 @@ public final class ListExecutor
 				}
 				if (includeGav)
 				{
-					pomAndGavs.add(new PomAndGav(pom, parent.gav));
+					pomAndGavs.add(PomAndGav.BUILDER.build(pom, parent.gav));
 				}
 			}
 			final Document pomDocument = this.pomParser.toDocument(pom.file);
@@ -115,7 +115,7 @@ public final class ListExecutor
 				}
 				if (includeGav)
 				{
-					pomAndGavs.add(new PomAndGav(pom, dependency.gav));
+					pomAndGavs.add(PomAndGav.BUILDER.build(pom, dependency.gav));
 				}
 			}
 		}

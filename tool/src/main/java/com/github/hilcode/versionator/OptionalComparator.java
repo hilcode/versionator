@@ -54,17 +54,10 @@ public final class OptionalComparator<T extends Comparable<T>>
 			{
 				if (a.isPresent() == b.isPresent())
 				{
-					if (a.isPresent())
-					{
-						return ComparisonChain
-								.start()
-								.compare(a.get(), b.get())
-								.result();
-					}
-					else
-					{
-						return 0;
-					}
+					return ComparisonChain
+							.start()
+							.compare(a.get(), b.get())
+							.result();
 				}
 				else
 				{

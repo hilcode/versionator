@@ -24,33 +24,48 @@ public final class Dependency
 	implements
 		Comparable<Dependency>
 {
+	public static final Dependency NONE = new Dependency();
+
 	public final Gav gav;
 
-	private Dependency(final Gav gav)
+	private Dependency()
+	{
+		this(Gav.NONE);
+	}
+
+	Dependency(final Gav gav)
 	{
 		Preconditions.checkNotNull(gav, "Missing 'gav'.");
 		this.gav = gav;
 	}
 
-	public Dependency apply(final Gav newGav)
-	{
-		Preconditions.checkNotNull(newGav, "Missing 'newGav'.");
-		return BUILDER.build(newGav);
-	}
-
 	@Override
 	public int compareTo(final Dependency other)
 	{
-		return ComparisonChain
-				.start()
-				.compare(this.gav, other.gav)
-				.result();
+		if (this == NONE)
+		{
+			return other == NONE ? 0 : -1;
+		}
+		else
+		{
+			return ComparisonChain
+					.start()
+					.compare(this.gav, other.gav)
+					.result();
+		}
 	}
 
 	@Override
 	public String toString()
 	{
-		return "(Dependency gav=" + this.gav + ")";
+		if (this == NONE)
+		{
+			return "(Dependency NONE)";
+		}
+		else
+		{
+			return "(Dependency gav=" + this.gav + ")";
+		}
 	}
 
 	@Override

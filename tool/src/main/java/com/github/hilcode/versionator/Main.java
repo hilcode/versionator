@@ -16,6 +16,10 @@
 package com.github.hilcode.versionator;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.github.hilcode.versionator.CommandLineInterface.CommandRelease;
@@ -44,8 +48,22 @@ public final class Main
 			{
 				if (basics.version != null)
 				{
-					System.out.println(
-							String.format("Versionator %s\n%s", Versionator.VERSION, Versionator.RELEASE_DATE));
+					final String eol = System.getProperty("line.separator");
+					final StringBuilder sb = new StringBuilder();
+					sb.append("Versionator ").append(Versionator.VERSION).append(eol);
+					sb.append(Versionator.RELEASE_DATE).append(" UTC");
+					final TimeZone utc = TimeZone.getTimeZone("UTC");
+					if (!TimeZone.getDefault().equals(utc))
+					{
+						final SimpleDateFormat dateFormatUtc = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+						dateFormatUtc.setTimeZone(utc);
+						final Date releaseDateUtc = dateFormatUtc.parse(Versionator.RELEASE_DATE);
+						final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+						final Calendar calendar = Calendar.getInstance();
+						calendar.setTimeInMillis(releaseDateUtc.getTime());
+						sb.append(" / ").append(dateFormat.format(calendar.getTime()));
+					}
+					System.out.println(sb.toString());
 				}
 				if (basics.help != null)
 				{
@@ -86,9 +104,11 @@ public final class Main
 				{
 					changedGavsBuilder.add(Gav.BUILDER.build(gavAsText));
 				}
-				final Model result = model.apply(changedGavsBuilder.build());
+				final Model result = Transformers.transformModelWithGavs(model, changedGavsBuilder.build());
 				final ModelWriter modelWriter = new ModelWriter(new VersionSetter(), new PropertySetter());
+				System.err.println("WRITE OUT MODEL:");
 				modelWriter.write(model, result);
+				System.err.println("WRITTEN OUT MODEL");
 			}
 			else if (CommandRelease.COMMAND.equals(commander.getParsedCommand()))
 			{
@@ -111,7 +131,7 @@ public final class Main
 				}
 				final ImmutableSet<GroupArtifact> exclusions = exclusionsBuilder.build();
 				final Model model = Model.BUILDER.build(pomFinder.findAllPoms(release.rootDir));
-				final Model result = model.release(exclusions);
+				final Model result = Transformers.releaseModel(model, exclusions);
 				final ModelWriter modelWriter = new ModelWriter(new VersionSetter(), new PropertySetter());
 				modelWriter.write(model, result);
 			}

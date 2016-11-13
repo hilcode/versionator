@@ -17,7 +17,13 @@ package com.github.hilcode.versionator;
 
 public interface Versionator
 {
+	/**
+	 * The current version.
+	 */
 	String VERSION = "@VERSION@";
 
+	/**
+	 * Release date in UTC.
+	 */
 	String RELEASE_DATE = "@RELEASE_DATE@";
 }

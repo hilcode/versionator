@@ -24,9 +24,16 @@ public final class Key
 	implements
 		Comparable<Key>
 {
-	private final String value;
+	public static final Key NONE = new Key();
 
-	private Key(final String value)
+	final String value;
+
+	private Key()
+	{
+		this.value = "";
+	}
+
+	Key(final String value)
 	{
 		Preconditions.checkNotNull(value, "Missing 'value'.");
 		final String value_ = value.trim();
@@ -61,10 +68,17 @@ public final class Key
 	@Override
 	public int compareTo(final Key other)
 	{
-		return ComparisonChain
-				.start()
-				.compare(this.value, other.value)
-				.result();
+		if (this == NONE)
+		{
+			return other == NONE ? 0 : -1;
+		}
+		else
+		{
+			return ComparisonChain
+					.start()
+					.compare(this.value, other.value)
+					.result();
+		}
 	}
 
 	public String toText()
@@ -75,11 +89,18 @@ public final class Key
 	@Override
 	public String toString()
 	{
-		final StringBuilder builder = new StringBuilder();
-		builder.append("(Key");
-		builder.append(" value='").append(this.value).append("'");
-		builder.append(")");
-		return builder.toString();
+		if (this == NONE)
+		{
+			return "(Key NONE)";
+		}
+		else
+		{
+			final StringBuilder builder = new StringBuilder();
+			builder.append("(Key");
+			builder.append(" value='").append(this.value).append("'");
+			builder.append(")");
+			return builder.toString();
+		}
 	}
 
 	public interface Builder

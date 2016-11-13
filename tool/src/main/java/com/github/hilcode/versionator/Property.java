@@ -24,22 +24,24 @@ public final class Property
 	implements
 		Comparable<Property>
 {
+	public static final Property NONE = new Property();
+
 	public final Key key;
 
 	public final String value;
 
-	private Property(final Key key, final String value)
+	private Property()
+	{
+		this.key = Key.NONE;
+		this.value = "";
+	}
+
+	Property(final Key key, final String value)
 	{
 		Preconditions.checkNotNull(key, "Missing 'key'.");
 		Preconditions.checkNotNull(value, "Missing 'value'.");
 		this.key = key;
 		this.value = value;
-	}
-
-	public Property apply(final String newValue)
-	{
-		Preconditions.checkNotNull(newValue, "Missing 'newValue'.");
-		return BUILDER.build(this.key, newValue);
 	}
 
 	@Override
@@ -70,22 +72,36 @@ public final class Property
 	@Override
 	public int compareTo(final Property other)
 	{
-		return ComparisonChain
-				.start()
-				.compare(this.key, other.key)
-				.compare(this.value, other.value)
-				.result();
+		if (this == NONE)
+		{
+			return other == NONE ? 0 : -1;
+		}
+		else
+		{
+			return ComparisonChain
+					.start()
+					.compare(this.key, other.key)
+					.compare(this.value, other.value)
+					.result();
+		}
 	}
 
 	@Override
 	public String toString()
 	{
-		final StringBuilder builder = new StringBuilder();
-		builder.append("(Property");
-		builder.append(" key=").append(this.key);
-		builder.append(" value='").append(this.value).append("'");
-		builder.append(")");
-		return builder.toString();
+		if (this == NONE)
+		{
+			return "(Property NONE)";
+		}
+		else
+		{
+			final StringBuilder builder = new StringBuilder();
+			builder.append("(Property");
+			builder.append(" key=").append(this.key);
+			builder.append(" value='").append(this.value).append("'");
+			builder.append(")");
+			return builder.toString();
+		}
 	}
 
 	public interface Builder
